@@ -1,0 +1,299 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  color: #333;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  margin: 20px 0;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  background: #6c757d;
+}
+
+.btn-danger {
+  background: #dc3545;
+}
+
+.btn-success {
+  background: #28a745;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transition: width 0.3s ease;
+}
+
+.score-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  margin: 0 auto;
+}
+
+.score-excellent {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.score-good {
+  background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+}
+
+.score-average {
+  background: linear-gradient(135deg, #fd7e14 0%, #dc3545 100%);
+}
+
+.score-poor {
+  background: linear-gradient(135deg, #dc3545 0%, #6f42c1 100%);
+}
+
+.recording-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.recording-dot {
+  width: 12px;
+  height: 12px;
+  background: #dc3545;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.question-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+  margin: 20px 0;
+  border-left: 5px solid #667eea;
+}
+
+.question-number {
+  background: #667eea;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.timer {
+  font-size: 24px;
+  font-weight: bold;
+  color: #667eea;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.result-card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.result-card h3 {
+  color: #667eea;
+  margin-bottom: 10px;
+}
+
+.strength-item, .improvement-item {
+  background: #f8f9fa;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  border-left: 3px solid #28a745;
+}
+
+.improvement-item {
+  border-left-color: #dc3545;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+  
+  .card {
+    padding: 20px;
+  }
+  
+  .result-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Print Styles */
+@media print {
+  /* Hide browser's default print interface */
+  @page {
+    margin: 0;
+    size: A4;
+  }
+  
+  body {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+  
+  /* Hide elements that shouldn't be printed */
+  .btn {
+    display: none !important;
+  }
+  
+  /* Ensure proper page breaks */
+  .card {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin: 0;
+    padding: 20px;
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+  
+  /* Remove hover effects for print */
+  .card:hover {
+    transform: none;
+  }
+  
+  /* Ensure charts and images print properly */
+  .recharts-wrapper {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  
+  /* Hide any browser UI elements */
+  header, footer, nav {
+    display: none !important;
+  }
+  
+  /* Ensure text is readable */
+  * {
+    color: black !important;
+  }
+  
+  /* Remove gradients for better print quality */
+  .score-circle {
+    background: #667eea !important;
+  }
+  
+  .score-excellent {
+    background: #28a745 !important;
+  }
+  
+  .score-good {
+    background: #ffc107 !important;
+  }
+  
+  .score-average {
+    background: #fd7e14 !important;
+  }
+  
+  .score-poor {
+    background: #dc3545 !important;
+  }
+} 
