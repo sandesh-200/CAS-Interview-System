@@ -71,16 +71,14 @@ class Routes:
             audio_file.save(filepath)
             print(f"Audio saved successfully, file size: {os.path.getsize(filepath)} bytes")
             
-            # Transcribe audio
-            print("Starting transcription...")
-            transcription = self.speech_service.transcribe_audio(filepath)
-            print(f"Transcription completed: {transcription}")
-            
-            print(f"\n=== REAL-TIME TRANSCRIPTION FOR QUESTION {question_index + 1} ===")
-            print(f"Question: {CAS_QUESTIONS[question_index]}")
-            print(f"Transcribed text: \"{transcription.get('text', '')}\"")
-            print(f"Language: {transcription.get('language', 'unknown')}")
-            print(f"Has meaningful content: {self.speech_service.has_meaningful_content(transcription)}")
+            # TEMPORARY: Skip speech recognition to test the flow
+            print("TEMPORARY: Skipping speech recognition for testing")
+            transcription = {
+                'text': 'Test response - speech recognition temporarily disabled',
+                'language': 'en',
+                'confidence': 'high'
+            }
+            print(f"Using test transcription: {transcription}")
             
             # Add response to session
             print("Adding response to session...")
@@ -105,7 +103,7 @@ class Routes:
                 'isComplete': is_complete,
                 'nextQuestion': CAS_QUESTIONS[question_index + 1] if not is_complete else None,
                 'transcription': transcription.get('text', ''),
-                'hasMeaningfulContent': self.speech_service.has_meaningful_content(transcription)
+                'hasMeaningfulContent': True  # Force to true for testing
             }
             
             print(f"Returning response: {response_data}")
