@@ -29,31 +29,52 @@ class Routes:
     def upload_audio(self):
         """Upload and transcribe audio response"""
         try:
+            print(f"\n=== UPLOAD AUDIO REQUEST ===")
+            print(f"Request method: {request.method}")
+            print(f"Request headers: {dict(request.headers)}")
+            print(f"Request form data keys: {list(request.form.keys())}")
+            print(f"Request files keys: {list(request.files.keys())}")
+            
             session_id = request.form.get('sessionId')
             question_index = int(request.form.get('questionIndex'))
             
+            print(f"Session ID: {session_id}")
+            print(f"Question index: {question_index}")
+            
             if 'audio' not in request.files:
+                print("ERROR: No audio file provided")
                 return jsonify({'error': 'No audio file provided'}), 400
             
             audio_file = request.files['audio']
+            print(f"Audio file: {audio_file.filename}, size: {len(audio_file.read())}")
+            audio_file.seek(0)  # Reset file pointer
             
             # Validate session
             session = self.session_manager.get_session(session_id)
             if not session:
+                print(f"ERROR: Session not found: {session_id}")
                 return jsonify({'error': 'Session not found'}), 404
+            
+            print(f"Session found: {session['id']}")
             
             # Validate question index
             if question_index < 0 or question_index >= len(CAS_QUESTIONS):
+                print(f"ERROR: Invalid question index: {question_index}")
                 return jsonify({'error': 'Invalid question index'}), 400
             
             # Save audio file
             filename = f"{session_id}-{audio_file.filename}"
             filepath = os.path.join(UPLOAD_FOLDER, filename)
             os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+            
+            print(f"Saving audio to: {filepath}")
             audio_file.save(filepath)
+            print(f"Audio saved successfully, file size: {os.path.getsize(filepath)} bytes")
             
             # Transcribe audio
+            print("Starting transcription...")
             transcription = self.speech_service.transcribe_audio(filepath)
+            print(f"Transcription completed: {transcription}")
             
             print(f"\n=== REAL-TIME TRANSCRIPTION FOR QUESTION {question_index + 1} ===")
             print(f"Question: {CAS_QUESTIONS[question_index]}")
@@ -62,30 +83,39 @@ class Routes:
             print(f"Has meaningful content: {self.speech_service.has_meaningful_content(transcription)}")
             
             # Add response to session
+            print("Adding response to session...")
             is_complete = self.session_manager.add_response(
                 session_id, 
                 question_index, 
                 filepath, 
                 transcription
             )
+            print(f"Response added, interview complete: {is_complete}")
             
             if is_complete:
+                print("Interview complete, starting AI analysis...")
                 # Analyze the entire interview
                 analysis = self.ai_service.analyze_interview(session)
                 self.session_manager.set_analysis(session_id, analysis)
+                print("AI analysis completed")
             
-            return jsonify({
+            response_data = {
                 'success': True,
                 'nextQuestionIndex': question_index + 1,
                 'isComplete': is_complete,
                 'nextQuestion': CAS_QUESTIONS[question_index + 1] if not is_complete else None,
                 'transcription': transcription.get('text', ''),
                 'hasMeaningfulContent': self.speech_service.has_meaningful_content(transcription)
-            })
+            }
+            
+            print(f"Returning response: {response_data}")
+            return jsonify(response_data)
             
         except Exception as e:
-            print(f"Error uploading audio: {e}")
-            return jsonify({'error': 'Failed to upload audio'}), 500
+            print(f"ERROR in upload_audio: {e}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({'error': f'Failed to upload audio: {str(e)}'}), 500
     
     def get_interview_result(self, session_id):
         """Get interview results"""
