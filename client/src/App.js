@@ -15,6 +15,7 @@ function App() {
     const savedSession = localStorage.getItem('interviewSession');
     if (savedSession) {
       const session = JSON.parse(savedSession);
+      console.log('Loading saved session:', session.sessionId);
       setSessionId(session.sessionId);
       setInterviewData(session.data);
     }
@@ -22,6 +23,7 @@ function App() {
 
   const startNewInterview = async () => {
     try {
+      console.log('Starting new interview...');
       const response = await fetch(getApiUrl('/api/start-interview'), {
         method: 'POST',
         headers: {
@@ -30,6 +32,7 @@ function App() {
       });
       
       const data = await response.json();
+      console.log('Interview started, session ID:', data.sessionId);
       setSessionId(data.sessionId);
       
       // Save session to localStorage
@@ -45,6 +48,7 @@ function App() {
   };
 
   const clearSession = () => {
+    console.log('Clearing session');
     setSessionId(null);
     setInterviewData(null);
     localStorage.removeItem('interviewSession');
