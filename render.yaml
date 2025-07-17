@@ -1,5 +1,4 @@
 services:
-  # Backend Flask API
   - type: web
     name: cas-interview-backend
     env: python
