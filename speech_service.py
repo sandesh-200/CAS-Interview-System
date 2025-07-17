@@ -1,18 +1,18 @@
 import os
 import tempfile
 from pydub import AudioSegment
-from faster_whisper import WhisperModel
-from config import WHISPER_MODEL, WHISPER_DEVICE, WHISPER_COMPUTE_TYPE
+import speech_recognition as sr
+from config import UPLOAD_FOLDER
 
 class SpeechService:
     def __init__(self):
-        print("Initializing local Whisper model...")
-        self.model = WhisperModel(WHISPER_MODEL, device=WHISPER_DEVICE, compute_type=WHISPER_COMPUTE_TYPE)
-        print("✓ Local Whisper model loaded successfully")
+        print("Initializing Google Speech Recognition...")
+        self.recognizer = sr.Recognizer()
+        print("✓ Google Speech Recognition initialized successfully")
     
     def optimize_audio(self, audio_file_path):
         try:
-            print("Optimizing audio for faster processing...")
+            print("Optimizing audio for speech recognition...")
             audio = AudioSegment.from_file(audio_file_path)
             audio = audio.set_frame_rate(16000)
             if audio.channels > 1:
@@ -37,64 +37,37 @@ class SpeechService:
             optimized_file = self.optimize_audio(audio_file_path)
             
             print("Loading optimized audio file...")
-            print("Recognizing speech with local Whisper (this may take a few seconds)...")
+            print("Recognizing speech with Google Speech Recognition...")
             
-            # Add timeout for transcription
-            import signal
-            def timeout_handler(signum, frame):
-                raise TimeoutError("Transcription timed out")
-            
-            signal.signal(signal.SIGALRM, timeout_handler)
-            signal.alarm(30)  # 30 second timeout
-            
-            try:
-                segments, info = self.model.transcribe(
-                    optimized_file,
-                    language="en",
-                    beam_size=5,
-                    vad_filter=True,
-                    vad_parameters=dict(min_silence_duration_ms=500)
-                )
-                signal.alarm(0)  # Cancel timeout
+            # Load the audio file
+            with sr.AudioFile(optimized_file) as source:
+                # Read the audio data
+                audio_data = self.recognizer.record(source)
                 
-                text_parts = []
-                segments_list = []
+                # Recognize speech using Google's free speech recognition
+                text = self.recognizer.recognize_google(audio_data, language='en-US')
                 
-                for segment in segments:
-                    text_parts.append(segment.text)
-                    segments_list.append({
-                        'start': segment.start,
-                        'end': segment.end,
-                        'text': segment.text
-                    })
-                
-                full_text = " ".join(text_parts).strip()
-                
-                if full_text:
-                    print(f"✓ Transcribed text: \"{full_text}\"")
-                    print(f"✓ Language: {info.language} (confidence: {info.language_probability:.2f})")
-                    print(f"✓ Processing time: Local Whisper")
-                    print(f"✓ Segments: {len(segments_list)}")
+                if text:
+                    print(f"✓ Transcribed text: \"{text}\"")
+                    print(f"✓ Language: English")
+                    print(f"✓ Processing time: Google Speech Recognition")
                     
                     return {
-                        'text': full_text,
-                        'language': info.language,
-                        'confidence': 'high' if info.language_probability > 0.8 else 'medium',
-                        'segments': segments_list
+                        'text': text,
+                        'language': 'en',
+                        'confidence': 'high',
+                        'segments': [{'start': 0, 'end': len(text), 'text': text}]
                     }
                 else:
                     print("✗ No speech detected in audio")
                     return self.get_fallback_transcription("No speech detected")
                     
-            except TimeoutError:
-                signal.alarm(0)  # Cancel timeout
-                print("✗ Transcription timed out, using fallback")
-                return self.get_fallback_transcription("Transcription timed out - using fallback")
-            except Exception as e:
-                signal.alarm(0)  # Cancel timeout
-                print(f"✗ Error during transcription: {e}")
-                return self.get_fallback_transcription(f"Transcription error: {e}")
-                    
+        except sr.UnknownValueError:
+            print("✗ Speech not recognized - audio may be unclear or silent")
+            return self.get_fallback_transcription("Speech not recognized - please speak clearly")
+        except sr.RequestError as e:
+            print(f"✗ Google Speech Recognition service error: {e}")
+            return self.get_fallback_transcription("Speech recognition service unavailable")
         except Exception as e:
             print(f"✗ Error transcribing audio: {e}")
             return self.get_fallback_transcription(f"Transcription error: {e}")

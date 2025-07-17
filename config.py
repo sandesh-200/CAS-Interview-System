@@ -8,10 +8,6 @@ FLASK_DEBUG = os.getenv('FLASK_ENV') != 'production'
 
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
-WHISPER_MODEL = "base"
-WHISPER_DEVICE = "cpu"
-WHISPER_COMPUTE_TYPE = "int8"
-
 CAS_QUESTIONS = [
     "Tell me about yourself and your background.",
     "Why are you interested in studying in the UK?",
