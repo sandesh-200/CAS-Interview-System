@@ -139,3 +139,43 @@ class Routes:
             return jsonify({'success': True, 'message': 'Interview session deleted'})
         else:
             return jsonify({'error': 'Session not found'}), 404 
+    
+    def test_upload(self):
+        """Test endpoint - just save audio without transcription"""
+        try:
+            print(f"\n=== TEST UPLOAD REQUEST ===")
+            print(f"Request method: {request.method}")
+            print(f"Request headers: {dict(request.headers)}")
+            print(f"Request form data keys: {list(request.form.keys())}")
+            print(f"Request files keys: {list(request.files.keys())}")
+            
+            if 'audio' not in request.files:
+                print("ERROR: No audio file provided")
+                return jsonify({'error': 'No audio file provided'}), 400
+            
+            audio_file = request.files['audio']
+            print(f"Audio file: {audio_file.filename}, size: {len(audio_file.read())}")
+            audio_file.seek(0)  # Reset file pointer
+            
+            # Save audio file
+            filename = f"test-{audio_file.filename}"
+            filepath = os.path.join(UPLOAD_FOLDER, filename)
+            os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+            
+            print(f"Saving audio to: {filepath}")
+            audio_file.save(filepath)
+            print(f"Audio saved successfully, file size: {os.path.getsize(filepath)} bytes")
+            
+            return jsonify({
+                'success': True,
+                'message': 'Audio file saved successfully',
+                'filename': filename,
+                'filepath': filepath,
+                'size': os.path.getsize(filepath)
+            })
+            
+        except Exception as e:
+            print(f"ERROR in test_upload: {e}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({'error': f'Test upload failed: {str(e)}'}), 500 

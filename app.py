@@ -63,6 +63,17 @@ def upload_audio():
         traceback.print_exc()
         return {'error': f'Upload failed: {str(e)}'}, 500
 
+@app.route('/api/test-upload', methods=['POST'])
+def test_upload():
+    try:
+        result = routes.test_upload()
+        return result
+    except Exception as e:
+        print(f"Error in test_upload route: {e}")
+        import traceback
+        traceback.print_exc()
+        return {'error': f'Test upload failed: {str(e)}'}, 500
+
 @app.route('/api/interview-result/<session_id>', methods=['GET'])
 def get_interview_result(session_id):
     return routes.get_interview_result(session_id)
