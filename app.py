@@ -7,7 +7,14 @@ from ai_service import AIService
 from routes import Routes
 
 app = Flask(__name__)
-CORS(app)
+
+# Configure CORS to allow frontend domain
+CORS(app, origins=[
+    "https://cas-interview-system-frontend.onrender.com",
+    "https://cas-interview-frontend.onrender.com",
+    "http://localhost:3000",  # For local development
+    "http://localhost:5000"   # For local development
+], supports_credentials=True)
 
 # Initialize services
 session_manager = SessionManager()
