@@ -1,0 +1,6 @@
+client/
+node_modules/
+*.log
+.env
+__pycache__/
+uploads/ 
