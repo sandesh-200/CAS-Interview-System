@@ -14,39 +14,31 @@ git commit -m "Prepare for Render deployment"
 git push origin main
 ```
 
-### Step 2: Deploy on Render
-
-#### Option A: Blueprint Deployment (Easiest)
+### Step 2: Deploy Backend (Blueprint)
 1. Go to [Render Dashboard](https://dashboard.render.com)
 2. Click "New" → "Blueprint"
 3. Connect your GitHub repository
 4. Set environment variable: `GEMINI_API_KEY`
 5. Click "Apply"
 
-#### Option B: Manual Deployment
-1. **Deploy Backend:**
-   - New → Web Service
-   - Connect GitHub repo
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `gunicorn app:app`
-   - Add env var: `GEMINI_API_KEY`
-
-2. **Deploy Frontend:**
-   - New → Static Site
-   - Connect GitHub repo
-   - Build Command: `cd client && npm install && npm run build`
-   - Publish Directory: `client/build`
-   - Add env var: `REACT_APP_API_URL` = your backend URL
-
-### Step 3: Update Frontend API URL
-After backend deploys, update frontend's `REACT_APP_API_URL` with your backend URL.
+### Step 3: Deploy Frontend (Manual)
+1. Go to [Render Dashboard](https://dashboard.render.com)
+2. Click "New" → "Static Site"
+3. Connect your GitHub repository
+4. Configure:
+   - **Name**: `cas-interview-frontend`
+   - **Build Command**: `cd client && npm install && npm run build`
+   - **Publish Directory**: `client/build`
+5. Add environment variable:
+   - `REACT_APP_API_URL`: Your backend URL (e.g., `https://cas-interview-backend.onrender.com`)
+6. Click "Create Static Site"
 
 ### Step 4: Test
 Visit your frontend URL and test the interview flow!
 
 ## 📁 Files Created for Deployment
 
-- `render.yaml` - Blueprint configuration
+- `render.yaml` - Backend blueprint configuration
 - `Procfile` - Backend startup command
 - `requirements.txt` - Updated with gunicorn
 - `client/src/config.js` - API URL configuration

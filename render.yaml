@@ -12,13 +12,4 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.0
       - key: FLASK_ENV
-        value: production
-
-  # Frontend React App
-  - type: static
-    name: cas-interview-frontend
-    buildCommand: cd client && npm install && npm run build
-    staticPublishPath: ./client/build
-    envVars:
-      - key: REACT_APP_API_URL
-        value: https://cas-interview-backend.onrender.com 
+        value: production 
