@@ -1,6 +1,37 @@
+# Frontend files
 client/
 node_modules/
-*.log
-.env
+package.json
+package-lock.json
+yarn.lock
+
+# Python cache
 __pycache__/
-uploads/ 
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Environment and logs
+.env
+*.log
+logs/
+
+# Uploads and temp files
+uploads/
+*.wav
+*.mp3
+*.m4a
+*.ogg
+*.webm
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db 
