@@ -8,13 +8,8 @@ from routes import Routes
 
 app = Flask(__name__)
 
-# Configure CORS to allow frontend domain
-CORS(app, origins=[
-    "https://cas-interview-system-frontend.onrender.com",
-    "https://cas-interview-frontend.onrender.com",
-    "http://localhost:3000",  # For local development
-    "http://localhost:5000"   # For local development
-], supports_credentials=True)
+# Configure CORS to allow all origins for now (we can restrict later)
+CORS(app, origins="*", supports_credentials=False, methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 
 # Initialize services
 session_manager = SessionManager()
