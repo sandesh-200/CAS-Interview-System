@@ -38,41 +38,62 @@ class SpeechService:
             
             print("Loading optimized audio file...")
             print("Recognizing speech with local Whisper (this may take a few seconds)...")
-            segments, info = self.model.transcribe(
-                optimized_file,
-                language="en",
-                beam_size=5,
-                vad_filter=True,
-                vad_parameters=dict(min_silence_duration_ms=500)
-            )
-            text_parts = []
-            segments_list = []
             
-            for segment in segments:
-                text_parts.append(segment.text)
-                segments_list.append({
-                    'start': segment.start,
-                    'end': segment.end,
-                    'text': segment.text
-                })
+            # Add timeout for transcription
+            import signal
+            def timeout_handler(signum, frame):
+                raise TimeoutError("Transcription timed out")
             
-            full_text = " ".join(text_parts).strip()
+            signal.signal(signal.SIGALRM, timeout_handler)
+            signal.alarm(30)  # 30 second timeout
             
-            if full_text:
-                print(f"✓ Transcribed text: \"{full_text}\"")
-                print(f"✓ Language: {info.language} (confidence: {info.language_probability:.2f})")
-                print(f"✓ Processing time: Local Whisper")
-                print(f"✓ Segments: {len(segments_list)}")
+            try:
+                segments, info = self.model.transcribe(
+                    optimized_file,
+                    language="en",
+                    beam_size=5,
+                    vad_filter=True,
+                    vad_parameters=dict(min_silence_duration_ms=500)
+                )
+                signal.alarm(0)  # Cancel timeout
                 
-                return {
-                    'text': full_text,
-                    'language': info.language,
-                    'confidence': 'high' if info.language_probability > 0.8 else 'medium',
-                    'segments': segments_list
-                }
-            else:
-                print("✗ No speech detected in audio")
-                return self.get_fallback_transcription("No speech detected")
+                text_parts = []
+                segments_list = []
+                
+                for segment in segments:
+                    text_parts.append(segment.text)
+                    segments_list.append({
+                        'start': segment.start,
+                        'end': segment.end,
+                        'text': segment.text
+                    })
+                
+                full_text = " ".join(text_parts).strip()
+                
+                if full_text:
+                    print(f"✓ Transcribed text: \"{full_text}\"")
+                    print(f"✓ Language: {info.language} (confidence: {info.language_probability:.2f})")
+                    print(f"✓ Processing time: Local Whisper")
+                    print(f"✓ Segments: {len(segments_list)}")
+                    
+                    return {
+                        'text': full_text,
+                        'language': info.language,
+                        'confidence': 'high' if info.language_probability > 0.8 else 'medium',
+                        'segments': segments_list
+                    }
+                else:
+                    print("✗ No speech detected in audio")
+                    return self.get_fallback_transcription("No speech detected")
+                    
+            except TimeoutError:
+                signal.alarm(0)  # Cancel timeout
+                print("✗ Transcription timed out, using fallback")
+                return self.get_fallback_transcription("Transcription timed out - using fallback")
+            except Exception as e:
+                signal.alarm(0)  # Cancel timeout
+                print(f"✗ Error during transcription: {e}")
+                return self.get_fallback_transcription(f"Transcription error: {e}")
                     
         except Exception as e:
             print(f"✗ Error transcribing audio: {e}")
